@@ -1,11 +1,13 @@
 from flask import Flask,render_template,request,redirect
 import csv
+from translate import Translator
+
 app = Flask(__name__)
 
 # @app.route('/<username>')
 # def hello_world(name=username):
 #     return 'name'
-
+translator = Translator(to_lang='ja')
 
 @app.route('/')
 def myhome():
@@ -22,6 +24,18 @@ def submit_form():
 			data = request.form.to_dict()
 			write_to_csv(data)
 			return render_template('/thankyou.html',data=data)
+		except:
+			return 'did not save to database'
+	else:
+		return 'something went wrong try again'
+
+@app.route('/translate', methods=['POST', 'GET'])
+def translate():
+	if request.method == 'POST':
+		try:
+			data = request.form.to_dict()
+			translation = translator.translate(data['english'])
+			return render_template('/translate.html',japanese=translation, data=data['english'])
 		except:
 			return 'did not save to database'
 	else:
